@@ -46,7 +46,7 @@ class _HomeScreenState extends State<HomeScreen> {
             IconButton(
               icon: const Icon(Icons.add, color: Colors.green, size: 28),
               onPressed: () {
-                // TODO: Implement add contact functionality
+
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
                     content: Text("Add Contact feature coming soon!"),

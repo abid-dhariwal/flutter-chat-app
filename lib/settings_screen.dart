@@ -1,9 +1,39 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'otp_screen.dart';
+import 'profile_screen.dart';
 
-class SettingsScreen extends StatelessWidget {
+class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
+
+  @override
+  State<SettingsScreen> createState() => _SettingsScreenState();
+}
+
+class _SettingsScreenState extends State<SettingsScreen> {
+  String? profilePicUrl;
+  final DatabaseReference dbRef = FirebaseDatabase.instance.ref().child("users");
+  String phone = "";
+
+  @override
+  void initState() {
+    super.initState();
+    loadProfilePic();
+  }
+
+  Future<void> loadProfilePic() async {
+    final user = FirebaseAuth.instance.currentUser;
+    phone = user?.phoneNumber ?? "";
+
+    final snapshot = await dbRef.child(phone).get();
+    if (snapshot.exists) {
+      final data = snapshot.value as Map;
+      setState(() {
+        profilePicUrl = data["profilePicUrl"];
+      });
+    }
+  }
 
   void _logout(BuildContext context) async {
     await FirebaseAuth.instance.signOut();
@@ -18,42 +48,51 @@ class SettingsScreen extends StatelessWidget {
     final user = FirebaseAuth.instance.currentUser;
 
     return Scaffold(
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(25),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.settings, size: 80, color: Colors.green),
-              const SizedBox(height: 20),
-              const Text(
-                'Settings',
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 20),
-              Text(
-                'Logged in as:\n${user?.phoneNumber ?? "Unknown"}',
-                textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 16),
-              ),
-              const SizedBox(height: 40),
-              ElevatedButton.icon(
-                onPressed: () => _logout(context),
-                icon: const Icon(Icons.logout),
-                label: const Text('Logout'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.redAccent,
-                  foregroundColor: Colors.white,
-                  padding:
-                  const EdgeInsets.symmetric(horizontal: 40, vertical: 14),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-              ),
-            ],
+      appBar: AppBar(
+        title: const Text("Settings"),
+        backgroundColor: Colors.green,
+      ),
+      body: ListView(
+        children: [
+          const SizedBox(height: 10),
+          // --- Profile Button ---
+          ListTile(
+            leading: CircleAvatar(
+              radius: 25,
+              backgroundColor: Colors.green,
+              backgroundImage:
+              profilePicUrl != null ? NetworkImage(profilePicUrl!) : null,
+              child: profilePicUrl == null
+                  ? const Icon(Icons.person, color: Colors.white)
+                  : null,
+            ),
+            title: const Text(
+              "Profile",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+            ),
+            subtitle: Text(user?.phoneNumber ?? "Unknown"),
+            trailing: const Icon(Icons.arrow_forward_ios, size: 18),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const ProfileScreen()),
+              ).then((_) {
+                // Reload profile pic after returning from ProfileScreen
+                loadProfilePic();
+              });
+            },
           ),
-        ),
+          const Divider(height: 30),
+          // --- Logout Button ---
+          ListTile(
+            leading: const Icon(Icons.logout, color: Colors.red),
+            title: const Text(
+              "Logout",
+              style: TextStyle(fontSize: 18),
+            ),
+            onTap: () => _logout(context),
+          ),
+        ],
       ),
     );
   }
