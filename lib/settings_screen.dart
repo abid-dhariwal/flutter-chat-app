@@ -35,12 +35,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
-  void _logout(BuildContext context) async {
-    await FirebaseAuth.instance.signOut();
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => const OTPScreen()),
-    );
+  void _logout(BuildContext context) {
+    FirebaseAuth.instance.signOut().then((_) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const OTPScreen()),
+      );
+    });
   }
 
   @override

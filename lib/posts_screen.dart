@@ -83,7 +83,7 @@ class _PostsScreenState extends State<PostsScreen> {
       _imageFile = null;
       _loading = false;
     });
-
+    if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text("Post added successfully!")),
     );
@@ -94,7 +94,7 @@ class _PostsScreenState extends State<PostsScreen> {
       margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       elevation: 4,
-      shadowColor: Colors.green.withOpacity(0.4),
+      shadowColor: Colors.green.withAlpha((0.4 * 255).toInt()),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -238,10 +238,10 @@ class _PostsScreenState extends State<PostsScreen> {
           ),
           ElevatedButton(
             onPressed: _loading ? null : addPost,
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
             child: _loading
                 ? const CircularProgressIndicator(color: Colors.white)
                 : const Text("Post"),
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
           ),
           const Divider(),
 

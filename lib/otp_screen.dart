@@ -63,6 +63,7 @@ class _OTPScreenState extends State<OTPScreen> {
       await FirebaseAuth.instance.signInWithCredential(credential);
       navigateToHome();
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Invalid OTP! Please try again.')),
       );
