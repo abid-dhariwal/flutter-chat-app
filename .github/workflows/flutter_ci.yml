@@ -19,7 +19,7 @@ jobs:
       # 2. Setup Flutter
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.13.2' # Flutter with Dart 3.8.1+
+          flutter-version: '3.38.2' # Flutter with Dart 3.8.1+
           channel: stable
 
       # 3. Enable Flutter dependencies caching
